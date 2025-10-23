@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>One Heart, One Goal — Barangay Portal</title>
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+
+  <!-- BACKGROUND -->
+  <div id="bgWrap" aria-hidden="true">
+    <canvas id="bgParticles" class="bg-layer"></canvas>
+    <div id="bgPlaceholder" class="bg-layer"></div>
+    <img id="bgImg" class="bg-layer lazy" alt="" />
+    <div class="bg-overlay"></div>
+    <div class="bg-vignette"></div>
+  </div>
+
+
+  <!-- LOADER -->
+  <div id="loader" class="loader">
+    <div class="loader-card">
+      <div class="loader-logo">💌</div>
+      <div class="loader-text">Preparing One Heart, One Goal...</div>
+      <div class="loader-bar"><div></div></div>
+    </div>
+  </div>
+
+
+  <!-- AUTH -->
+  <div id="authWrap" class="auth-wrap hidden" role="region" aria-label="Authentication">
+    <section id="loginCard" class="card auth-card" aria-labelledby="loginTitle">
+      <div class="brand">
+        <div class="logo-anim" aria-hidden="true"><span>💌</span></div>
+        <div>
+          <h1 id="loginTitle" class="logo-title">One Heart, One Goal</h1>
+          <small class="muted">Barangay Complaint System</small>
+        </div>
+      </div>
+
+
+      <form id="loginForm" class="form" autocomplete="on" aria-describedby="loginHelp">
+        <label for="loginUser">Username</label>
+        <input id="loginUser" name="username" type="text" autocomplete="username" required />
+
+
+        <label for="loginPass">Password</label>
+        <input id="loginPass" name="password" type="password" autocomplete="current-password" required />
+
+
+        <div class="form-row">
+          <button type="submit" class="btn btn-primary" id="loginBtn"><span class="btn-icon">🔒</span>Login</button>
+          <button id="openSignup" type="button" class="btn btn-ghost"><span class="btn-icon">✍️</span>Create</button>
+        </div>
+
+
+        <p id="loginFeedback" class="feedback" role="status" aria-live="polite"></p>
+        <p id="loginHelp" class="muted tiny">Admin backdoor: <code>barangay_admin</code> / <code>barangay123</code></p>
+      </form>
+    </section>
+  </div>
+
+
+  <!-- SIGNUP Modal -->
+  <div id="signupModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+    <div class="modal-card">
+      <h3 id="signupTitle">Create account</h3>
+      <form id="signupForm" class="form" autocomplete="off">
+        <label for="signupName">Full name</label>
+        <input id="signupName" type="text" required />
+
+
+        <label for="signupUser">Username</label>
+        <input id="signupUser" type="text" required />
+
+
+        <label for="signupPass">Password</label>
+        <input id="signupPass" type="password" required />
+
+
+        <div class="form-row">
+          <button type="submit" class="btn btn-primary"><span class="btn-icon">✔️</span>Create</button>
+          <button id="closeSignup" type="button" class="btn btn-ghost">Cancel</button>
+        </div>
+        <p id="signupFeedback" class="feedback" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- REMARKS Modal (admin) -->
+  <div id="remarksModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="remarksTitle">
+    <div class="modal-card">
+      <h3 id="remarksTitle">Add Remark / Action</h3>
+      <div class="form">
+        <label for="remarkPreset">Quick remark</label>
+        <select id="remarkPreset">
+          <option value="">— choose quick remark —</option>
+          <option value="Report received and logged for review">Report received and logged for review</option>
+          <option value="Under verification by barangay staff">Under verification by barangay staff</option>
+          <option value="In progress — maintenance on site">In progress — maintenance on site</option>
+          <option value="Cleaning operation scheduled">Cleaning operation scheduled</option>
+          <option value="Forwarded to City Engineering Office">Forwarded to City Engineering Office</option>
+          <option value="Requires immediate action — high priority">Requires immediate action — high priority</option>
+          <option value="Resolved — cleared and verified">Resolved — cleared and verified</option>
+          <option value="Invalid / insufficient evidence">Invalid / insufficient evidence</option>
+          <option value="Duplicate — merged to existing report">Duplicate — merged to existing report</option>
+        </select>
+
+
+        <label for="remarkCustom">Custom remark</label>
+        <textarea id="remarkCustom" rows="3" placeholder="Add additional details (optional)"></textarea>
+
+
+        <label for="remarkNewStatus">Change status to</label>
+        <select id="remarkNewStatus">
+          <option value="">(no change)</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Urgent">Urgent</option>
+          <option value="Done">Done</option>
+          <option value="Archived">Archived</option>
+        </select>
+
+
+        <div class="form-row">
+          <button id="saveRemarkBtn" class="btn btn-primary">Save remark</button>
+          <button id="closeRemarks" class="btn btn-ghost">Cancel</button>
+        </div>
+      </div>
+      <p id="remarksFeedback" class="feedback"></p>
+    </div>
+  </div>
+
+
+  <!-- LOG Modal -->
+  <div id="logModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3>Report Log</h3>
+      <div id="logList" style="max-height:360px;overflow:auto"></div>
+      <div style="margin-top:10px"><button id="closeLog" class="btn btn-ghost">Close</button></div>
+    </div>
+  </div>
+
+
+  <!-- CONTACT Modal -->
+  <div id="contactModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3>Contact Resident</h3>
+      <div id="contactInfo"></div>
+      <div style="margin-top:10px"><button id="closeContact" class="btn btn-ghost">Close</button></div>
+    </div>
+  </div>
+
+
+  <!-- APP -->
+  <div id="app" class="app-layout hidden" role="application" aria-hidden="true">
+
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar" aria-label="Main navigation">
+      <div class="side-top">
+        <div class="brand-small">
+          <div class="brand-logo-sm">💌</div>
+          <div>
+            <div class="brand-name">One Heart, One Goal</div>
+            <div class="brand-sub muted">Barangay Portal</div>
+          </div>
+        </div>
+        <button id="collapseBtn" class="icon-btn" title="Collapse sidebar">⤫</button>
+      </div>
+
+
+      <nav class="nav" role="navigation" aria-label="Sidebar">
+        <a href="#" class="nav-link active" data-page="home">🏠 Home</a>
+        <a href="#" class="nav-link" data-page="dashboard">📊 Dashboard <span id="badgeTotal" class="badge"></span></a>
+        <a href="#" class="nav-link" data-page="report">📝 Report</a>
+        <a href="#" class="nav-link" data-page="profile">👤 Profile</a>
+        <a href="#" class="nav-link" data-page="about">ℹ️ About</a>
+        <a href="#" class="nav-link" data-page="contact">📞 Contact</a>
+      </nav>
+
+
+      <div class="side-bottom">
+        <div>
+          <div id="profileName" class="profile-name">Guest</div>
+          <div id="profileRole" class="muted">—</div>
+        </div>
+        <div class="controls">
+          <button id="themeToggle" class="icon-btn" title="Toggle theme">🌙</button>
+          <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+        </div>
+      </div>
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-area">
+
+
+      <!-- TOPBAR -->
+     <div class="topbar">
+  <input id="globalSearch" type="text" placeholder="🔍 Search reports, people, or issues..." />
+  <div class="topbar-right">
+    <button id="quickReportBtn" class="btn btn-primary small">＋ Quick</button>
+    <div id="clock" class="muted"></div>
+  </div>
+</div>
+
+
+
+
+      <!-- HOME PAGE (organized, static hero) -->
+      <section id="home" class="page active">
+        <div class="card home-card" style="padding: 32px 24px;">
+          <div class="home-hero">
+            <h1>One Heart, One Goal</h1>
+            <p class="lead">
+              Together, we build a stronger and more connected community. This platform unites residents and barangay officials to address local concerns with <strong>efficiency, transparency, and compassion.</strong>
+            </p>
+           
+
+
+          <div class="home-sections">
+            <div class="home-section">
+              <h3>💡 Our Mission</h3>
+              <p>To promote collaboration and trust between residents and officials through an accessible digital system that encourages participation, accountability, and community-driven solutions.</p>
+            </div>
+
+
+            <div class="home-section">
+              <h3>🌏 Our Vision</h3>
+              <p>A progressive barangay where technology empowers people, strengthens public service, and sustains growth — one united goal at a time.</p>
+            </div>
+
+
+            <div class="home-section">
+              <h3>🧭 Core Values</h3>
+              <div class="values-list">
+                <div class="val">🤝 Unity</div>
+                <div class="val">💡 Transparency</div>
+                <div class="val">🚀 Innovation</div>
+                <div class="val">❤️ Service</div>
+              </div>
+            </div>
+
+
+            <div class="home-section home-full how-report">
+              <h3>📢 How to Report a Concern</h3>
+              <p>Reporting is simple — follow these steps to make your voice heard and help the barangay respond quickly:</p>
+              <ol>
+                <li>🔐 Log in to your account or create one if you don’t have an account yet.</li>
+                <li>📊 Click <strong>Submit Report</strong> (or use <strong>Quick</strong> in the topbar) to open the report form.</li>
+                <li>📝 Fill out the category, location, and a clear description of the issue.</li>
+                <li>📷 Attach a photo to help verification (optional but helpful).</li>
+                <li>🚀 Click <strong>Submit</strong> — you’ll receive updates on the dashboard and notifications.</li>
+              </ol>
+              <p class="muted">Pro tip: include nearby landmarks or block numbers for faster response.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="page hidden">
+        <div class="dashboard-grid">
+          <div class="stats">
+            <div class="stat-card"><div><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total</div></div><div class="stat-icon">📁</div></div>
+            <div class="stat-card"><div><div class="stat-value" id="statPending">0</div><div class="stat-label">Pending</div></div><div class="stat-icon">⏳</div></div>
+            <div class="stat-card"><div><div class="stat-value" id="statDone">0</div><div class="stat-label">Done</div></div><div class="stat-icon">✅</div></div>
+          </div>
+
+
+          <div class="chart-card card"><canvas id="reportsChart" height="220"></canvas></div>
+
+
+          <div class="reports-panel card">
+            <div class="panel-head">
+              <h3>Reports</h3>
+              <div class="filters">
+                <input id="searchInput" placeholder="Search reports" />
+                <select id="categoryFilter"><option value="">All</option><option>Garbage</option><option>Road</option><option>Flood</option><option>Other</option></select>
+              </div>
+            </div>
+            <div id="reportsList" class="reports-list"><p class="muted">No reports yet.</p></div>
+            <div style="margin-top:12px;display:flex;gap:8px;">
+              <button id="exportCsv" class="btn btn-ghost small">Export CSV</button>
+              <button id="printBtn" class="btn btn-ghost small">Print</button>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;">
+  <button id="backupBtn" class="btn btn-primary small">💾 Backup Data</button>
+  <input type="file" id="restoreInput" accept=".json" style="display:none" />
+  <button id="restoreBtn" class="btn btn-ghost small">♻️ Restore Data</button>
+</div>
+
+          </div>
+        </div>
+      </section>
+
+
+      <!-- REPORT -->
+      <section id="report" class="page hidden">
+        <div class="report-grid">
+          <div class="card form-wrap">
+            <h3>Submit Report</h3>
+            <form id="reportForm" class="form">
+              <label>Your name</label><input id="name" readonly />
+              <label>Category</label>
+              <select id="category">
+                <option value="">Select category</option>
+                <option>Garbage</option>
+                <option>Road</option>
+                <option>Flood</option>
+                <option>Other</option>
+              </select>
+              <label>Location</label><input id="location" />
+              <label>Description</label><textarea id="description" rows="4" required></textarea>
+              <label>Photo</label><input id="photo" type="file" accept="image/*" />
+              <div id="previewWrap" class="img-preview hidden"><img id="previewImg" alt="preview"></div>
+              <div class="form-row"><button type="submit" class="btn btn-primary"><span class="btn-icon">📤</span>Submit</button><button id="resetReport" type="button" class="btn btn-ghost">Reset</button></div>
+            </form>
+            <p id="reportFeedback" class="feedback" aria-live="polite"></p>
+          </div>
+
+
+          <div class="card tips">
+            <h3>Tips</h3>
+            <ul>
+              <li>Include clear photos of the issue.</li>
+              <li>Be specific with your location.</li>
+              <li>Provide detailed description.</li>
+            </ul>
+            <hr/>
+            <h4>Recent Reports</h4>
+            <div id="recentMini" class="mini-feed muted">No recent reports.</div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- PROFILE -->
+      <section id="profile" class="page hidden">
+        <div class="card">
+          <h3>Profile</h3>
+          <p><strong id="pfName"></strong> • <span id="pfUser"></span></p>
+          <p>Role: <span id="pfRole"></span></p>
+          <hr/>
+          <h4>Your Reports</h4>
+          <div id="userReports" class="reports-list muted">No reports yet.</div>
+        </div>
+      </section>
+
+
+      <!-- ABOUT -->
+      <section id="about" class="page hidden card">
+        <h3>About</h3>
+        <p><strong>One Heart, One Goal</strong> — One Heart, One Goal is more than just a Barangay Complaint and Reporting System — it is a commitment to unity, service, and progress within our community. Built with the vision of strengthening the bond between citizens and barangay officials, this platform provides a simple yet powerful way to voice concerns, share feedback, and take part in shaping a better barangay.
+
+
+In the past, many residents struggled to reach officials or report local issues such as flooding, garbage accumulation, streetlight outages, or damaged roads. One Heart, One Goal addresses this challenge by creating an accessible online space where every citizen’s concern is heard, recorded, and acted upon with transparency and accountability.
+
+
+Our system ensures that every report is properly documented and forwarded to the right department for quick response and resolution. It also allows barangay officials to monitor cases efficiently, track progress, and maintain a clear record of community concerns — helping improve governance, responsiveness, and public trust.
+
+
+Beyond technology, this initiative reflects our shared belief that good governance begins with collaboration. We envision a barangay where people are not just residents but active partners in building a safe, clean, and progressive community. Through One Heart, One Goal, we aim to cultivate a culture of communication, honesty, and teamwork — where every action, big or small, contributes to the betterment of all.
+
+
+Together, we stand by our promise: One Heart, One Goal — Serving the community with integrity, unity, and compassion.</p>
+      </section>
+
+
+      <!-- CONTACT -->
+      <section id="contact" class="page hidden card">
+        <h3>Contact</h3>
+        <p>axl.narvaez@my.nst.edu.ph</p>
+        <p>jonas.anillo@my.nst.edu.ph</p>
+      </section>
+
+
+      <div id="notification" class="notification hidden" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+
+
+  <footer class="footer">
+    <div id="footerClock">© <span id="year"></span> Barangay Portal</div>
+  </footer>
+
+
+  <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7cbf8dfc3d.mp3?filename=ui-click-133875.mp3"></audio>
+
+
+  <script src="app.js"></script>
+</body>
+</html>
+
+
+
+
+
