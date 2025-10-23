@@ -406,3 +406,17 @@ body {
   color: #00c7d9;
   transform: scale(1.1);
 }
+
+@media only screen and (max-width: 600px) {
+  body { font-size: 14px; padding: 10px; }
+  .navbar { flex-direction: column; gap: 10px; }
+  .container { width: 95%; }
+  .card { width: 100%; margin-bottom: 15px; }
+  button { width: 100%; padding: 10px; font-size: 16px; }
+}
+
+@media only screen and (max-width: 768px) {
+  body { font-size: 16px; }
+  .navbar { justify-content: center; gap: 15px; }
+  .container { width: 90%; }
+}
