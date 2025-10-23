@@ -1,0 +1,14 @@
+.vscode/
+node_modules/
+Thumbs.db
+*.log
+*.tmp
+AppData/
+Downloads/
+OneDrive/
+Music/
+Videos/
+Contacts/
+Favorites/
+Saved Games/
+Links/
